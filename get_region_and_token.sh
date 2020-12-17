@@ -27,7 +27,7 @@ function check_tool() {
   then
     echo "$cmd could not be found"
     echo "Please install $package"
-    exit 1
+    return 1
   fi
 }
 # Now we call the function to make sure we can use curl and jq.
@@ -73,7 +73,7 @@ if [[ ${#all_region_data} -lt 1000 ]]; then
   echo "Could not get correct region data. To debug this, run:"
   echo "$ curl -v $serverlist_url"
   echo "If it works, you will get a huge JSON as a response."
-  exit 1
+  return 1
 fi
 # Notify the user that we got the server list.
 echo "OK!"
@@ -102,7 +102,7 @@ if [ -z "$bestRegion" ]; then
   echo No region responded within ${MAX_LATENCY}s, consider using a higher timeout.
   echo For example, to wait 1 second for each region, inject MAX_LATENCY=1 like this:
   echo $ MAX_LATENCY=1 . \"$SCRIPTDIR/get_region_and_token.sh\"
-  exit 1
+  return 1
 fi
 
 # Get all data for the best region
@@ -142,7 +142,7 @@ if [[ ! $PIA_USER || ! $PIA_PASS ]]; then
   echo If you want this script to automatically get a token from the Meta
   echo service, please add the variables PIA_USER and PIA_PASS. Example:
   echo $ PIA_USER=p0123456 PIA_PASS=xxx . \"$SCRIPTDIR/get_region_and_token.sh\"
-  exit 1
+  return 1
 fi
 
 echo "The . \"$SCRIPTDIR/get_region_and_token.sh\" script got started with PIA_USER and PIA_PASS,
@@ -162,7 +162,7 @@ if [ "$(echo "$generateTokenResponse" | jq -r '.status')" != "OK" ]; then
   echo $ curl -vs -u \"$PIA_USER:$PIA_PASS\" --cacert \"$SCRIPTDIR/ca.rsa.4096.crt\" \
     --connect-to \"$bestServer_meta_hostname::$bestServer_meta_IP:\" \
     https://$bestServer_meta_hostname/authv3/generateToken
-  exit 1
+  return 1
 fi
 
 token="$(echo "$generateTokenResponse" | jq -r '.token')"
@@ -184,7 +184,7 @@ if [[ $PIA_AUTOCONNECT == wireguard ]]; then
   echo
   PIA_PF=$PIA_PF PIA_TOKEN="$token" WG_SERVER_IP=$bestServer_WG_IP \
     WG_HOSTNAME=$bestServer_WG_hostname . "$SCRIPTDIR/connect_to_wireguard_with_token.sh"
-  exit 0
+  return 0
 fi
 
 if [[ $PIA_AUTOCONNECT == openvpn* ]]; then
@@ -208,7 +208,7 @@ if [[ $PIA_AUTOCONNECT == openvpn* ]]; then
     OVPN_HOSTNAME=$serverHostname \
     CONNECTION_SETTINGS=$PIA_AUTOCONNECT \
     . "$SCRIPTDIR/connect_to_openvpn_with_token.sh"
-  exit 0
+  return 0
 fi
 
 echo If you wish to automatically connect to the VPN after detecting the best

@@ -26,7 +26,7 @@ function check_tool() {
   then
     echo "$cmd could not be found"
     echo "Please install $cmd"
-    exit 1
+    return 1
   fi
 }
 # Now we call the function to make sure we can use wg-quick, curl and jq.
@@ -58,7 +58,7 @@ if [[ "$adapter_check" != *"$should_read"* ]]; then
     fi
     if echo ${close_connection:0:1} | grep -iq n ; then
       echo Closing script. Resolve tun06 adapter conflict and run the script again.
-      exit 1
+      return 1
     fi
     echo Killing the existing OpenVPN process and waiting 5 seconds...
     kill $old_pid
@@ -103,7 +103,7 @@ if [[ ! $OVPN_SERVER_IP ||
   echo as it will guide you through getting the best server and
   echo also a token. Detailed information can be found here:
   echo https://github.com/pia-foss/manual-connections
-  exit 1
+  return 1
 fi
 
 # Create a credentials file with the login token
@@ -112,7 +112,7 @@ echo "Trying to write $SCRIPTDIR/pia.ovpn...
 mkdir -p "$SCRIPTDIR"
 rm -f "$SCRIPTDIR"/credentials "$SCRIPTDIR"/route_info
 echo ${PIA_TOKEN:0:62}"
-"${PIA_TOKEN:62} > "$SCRIPTDIR"/credentials || exit 1
+"${PIA_TOKEN:62} > "$SCRIPTDIR"/credentials || return 1
 chmod 600 "$SCRIPTDIR"/credentials
 
 # Translate connection settings variable
@@ -142,7 +142,7 @@ else
 fi
 
 # Create the OpenVPN config based on the settings specified
-cat "$SCRIPTDIR/$prefix_filepath" > "$SCRIPTDIR"/pia.ovpn || exit 1
+cat "$SCRIPTDIR/$prefix_filepath" > "$SCRIPTDIR"/pia.ovpn || return 1
 echo remote $OVPN_SERVER_IP $port $protocol >> "$SCRIPTDIR"/pia.ovpn
 
 # Copy the up/down scripts to "$SCRIPTDIR"/
@@ -176,7 +176,7 @@ Trying to start the OpenVPN connection..."
 openvpn --daemon \
   --config \"$SCRIPTDIR/pia.ovpn\" \
   --writepid \"$SCRIPTDIR/pia_pid\" \
-  --log \"$SCRIPTDIR/debug_info\" || exit 1
+  --log \"$SCRIPTDIR/debug_info\" || return 1
 
 echo "
 The OpenVPN connect command was issued.
@@ -203,7 +203,7 @@ gateway_ip="$( cat "$SCRIPTDIR"/route_info )"
 if [ "$connected" != true ]; then
   echo "The VPN connection was not established within 10 seconds."
   kill $ovpn_pid
-  exit 1
+  return 1
 fi
 
 echo "Initialization Sequence Complete!

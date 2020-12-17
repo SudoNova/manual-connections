@@ -27,7 +27,7 @@ function check_tool() {
   then
     echo "$cmd could not be found"
     echo "Please install $package"
-    exit 1
+    return 1
   fi
 }
 # Now we call the function to make sure we can use wg-quick, curl and jq.
@@ -65,7 +65,7 @@ if [[ ! $WG_SERVER_IP || ! $WG_HOSTNAME || ! $PIA_TOKEN ]]; then
   echo as it will guide you through getting the best server and
   echo also a token. Detailed information can be found here:
   echo https://github.com/pia-foss/manual-connections
-  exit 1
+  return 1
 fi
 
 # Create ephemeral wireguard keys, that we don't need to save to disk.
@@ -93,7 +93,7 @@ echo "$wireguard_json"
 # Check if the API returned OK and stop this script if it didn't.
 if [ "$(echo "$wireguard_json" | jq -r '.status')" != "OK" ]; then
   >&2 echo "Server did not return OK. Stopping now."
-  exit 1
+  return 1
 fi
 
 # Multi-hop is out of the scope of this repo, but you should be able to
@@ -129,7 +129,7 @@ PersistentKeepalive = 25
 PublicKey = $(echo "$wireguard_json" | jq -r '.server_key')
 AllowedIPs = 0.0.0.0/0
 Endpoint = ${WG_SERVER_IP}:$(echo "$wireguard_json" | jq -r '.server_port')
-" > /etc/wireguard/pia.conf || exit 1
+" > /etc/wireguard/pia.conf || return 1
 echo OK!
 
 # Start the WireGuard interface.
@@ -138,7 +138,7 @@ echo OK!
 # just hardcode /etc/resolv.conf to "nameserver 10.0.0.242".
 echo
 echo Trying to create the wireguard interface...
-wg-quick up pia || exit 1
+wg-quick up pia || return 1
 echo "The WireGuard interface got created.
 At this point, internet should work via VPN.
 
