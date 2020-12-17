@@ -174,9 +174,9 @@ sed -i "s,\$SCRIPTDIR,$SCRIPTDIR,g" "$SCRIPTDIR/pia.ovpn"
 echo "
 Trying to start the OpenVPN connection..."
 openvpn --daemon \
-  --config \"$SCRIPTDIR/pia.ovpn\" \
-  --writepid \"$SCRIPTDIR/pia_pid\" \
-  --log \"$SCRIPTDIR/debug_info\" || return 1
+  --config "$SCRIPTDIR/pia.ovpn" \
+  --writepid "$SCRIPTDIR/pia_pid" \
+  --log "$SCRIPTDIR/debug_info" || return 1
 
 echo "
 The OpenVPN connect command was issued.
