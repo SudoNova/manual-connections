@@ -176,7 +176,8 @@ Trying to start the OpenVPN connection..."
 openvpn --daemon \
   --config "$SCRIPTDIR/pia.ovpn" \
   --writepid "$SCRIPTDIR/pia_pid" \
-  --log "$SCRIPTDIR/debug_info" || return 1
+  --log "$SCRIPTDIR/debug_info" \
+  $OVPN_OPTS || return 1
 
 echo "
 The OpenVPN connect command was issued.
