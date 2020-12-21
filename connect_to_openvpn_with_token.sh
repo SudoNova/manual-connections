@@ -33,6 +33,7 @@ function check_tool() {
 check_tool curl
 check_tool jq
 check_tool openvpn
+check_tool sed
 
 SCRIPTDIR=$(dirname $(realpath $BASH_SOURCE))
 

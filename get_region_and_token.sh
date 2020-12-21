@@ -33,6 +33,7 @@ function check_tool() {
 # Now we call the function to make sure we can use curl and jq.
 check_tool curl curl
 check_tool jq jq
+check_tool sed sed
 
 SCRIPTDIR=$(dirname $(realpath $BASH_SOURCE))
 
